@@ -2,8 +2,12 @@ import express from "express";
 import puppeteer from "puppeteer";
 
 const app = express();
-const SEARCH_BAR = '#__left-search > form > input[type=text]';
-const SEARCH_BUTTON = '#__left-search > form > button';
+
+const MY_AGENT = 'Chrome/88.0.4298.0';
+const MAIN_PAGE = 'https://www.inven.co.kr/search/';
+const SEARCH_BAR = '#searchword';
+const SEARCH_BUTTON = 'body > header > div > div.isearch_layout > div > div > button';
+const CLICK_TO_SEE_MORE = '#searchBody > div.commu-wrap > section > article > section > div.commu-body.pcMain > div > div > div.section_body > ul > li.more > a';
 
 const SEARCH_WARRIOR_PRESETS = '상시공유 슈샤';
 const SEARCH_MAGE_PRESETS = '상시공유 실린';
@@ -27,11 +31,15 @@ async function run() {
         headless: false
     });
     const page = await browser.newPage();
-    await page.goto('https://lostark.inven.co.kr');
+    await page.setUserAgent(MY_AGENT);
+    await page.goto(MAIN_PAGE);
 
     await page.click(SEARCH_BAR);
-    await page.keyboard.type(SEARCH_MARTIAL_ARTIST_PRESETS);
+    await page.keyboard.type(SEARCH_MARTIAL_ARTIST_PRESETS, {delay: 1000});
     await page.click(SEARCH_BUTTON);
+    await page.waitForNavigation();
+    
+    await page.click(CLICK_TO_SEE_MORE);
     await page.waitForNavigation();
 
     await page.screenshot({ path: 'screenshots/test.png' });
